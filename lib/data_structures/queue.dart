@@ -1,2 +1,2 @@
-class Stack {
+class Queue {
 }
