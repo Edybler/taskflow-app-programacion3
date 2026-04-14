@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/task_model.dart';
 import '../services/api_service.dart';
 import '../data_structures/linked_list.dart';
+import 'queue_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -114,6 +115,18 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('TaskFlow App - Lista Enlazada'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.queue),
+            tooltip: 'Ver Cola',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QueueScreen()),
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: insertNewTask,
