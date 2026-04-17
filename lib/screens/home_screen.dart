@@ -3,6 +3,7 @@ import '../models/task_model.dart';
 import '../services/api_service.dart';
 import '../data_structures/linked_list.dart';
 import 'queue_screen.dart';
+import 'users_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,9 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final id = int.tryParse(searchController.text);
 
     if (id == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un ID válido')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Ingresa un ID válido')));
       return;
     }
 
@@ -77,9 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
       displayedTasks = linkedList.toList();
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Tarea $id eliminada')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Tarea $id eliminada')));
   }
 
   void insertNewTask() {
@@ -98,9 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
       displayedTasks = linkedList.toList();
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Nueva tarea insertada')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Nueva tarea insertada')));
   }
 
   @override
@@ -116,6 +117,16 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('TaskFlow App - Lista Enlazada'),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: 'Ver Usuarios',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const UsersScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.queue),
             tooltip: 'Ver Cola',
@@ -173,41 +184,39 @@ class _HomeScreenState extends State<HomeScreen> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : errorMessage != null
-                      ? Center(child: Text(errorMessage!))
-                      : displayedTasks.isEmpty
-                          ? const Center(
-                              child: Text('No hay tareas para mostrar'),
-                            )
-                          : ListView.builder(
-                              itemCount: displayedTasks.length,
-                              itemBuilder: (context, index) {
-                                final task = displayedTasks[index];
+                  ? Center(child: Text(errorMessage!))
+                  : displayedTasks.isEmpty
+                  ? const Center(child: Text('No hay tareas para mostrar'))
+                  : ListView.builder(
+                      itemCount: displayedTasks.length,
+                      itemBuilder: (context, index) {
+                        final task = displayedTasks[index];
 
-                                return Card(
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      child: Text(task.id.toString()),
-                                    ),
-                                    title: Text(task.title),
-                                    subtitle: Text('Usuario: ${task.userId}'),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          task.completed
-                                              ? Icons.check_circle
-                                              : Icons.pending_actions,
-                                        ),
-                                        IconButton(
-                                          onPressed: () => deleteTask(task.id),
-                                          icon: const Icon(Icons.delete),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
+                        return Card(
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              child: Text(task.id.toString()),
                             ),
+                            title: Text(task.title),
+                            subtitle: Text('Usuario: ${task.userId}'),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  task.completed
+                                      ? Icons.check_circle
+                                      : Icons.pending_actions,
+                                ),
+                                IconButton(
+                                  onPressed: () => deleteTask(task.id),
+                                  icon: const Icon(Icons.delete),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
