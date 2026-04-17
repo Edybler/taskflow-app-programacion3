@@ -1,4 +1,4 @@
-
+import 'package:flutter/foundation.dart';
 
 class ActionLog {
   final String action; // "insertar", "eliminar", "buscar"
@@ -8,7 +8,8 @@ class ActionLog {
   ActionLog(this.action, this.value) : timestamp = DateTime.now();
 
   @override
-  String toString() => "[${timestamp.toString().substring(11, 19)}] $action: $value";
+  String toString() =>
+      "[${timestamp.toString().substring(11, 19)}] $action: $value";
 }
 
 class MyStack<T> {
@@ -46,11 +47,16 @@ class MyStack<T> {
   // Auxiliares
   bool get isEmpty => _storage.isEmpty;
   int get length => _storage.length;
-  
+  List<T> get items => List.unmodifiable(_storage);
+
   void printHistory() {
-    print("--- Historial de la Pila ---");
+    if (kDebugMode) {
+      print("--- Historial de la Pila ---");
+    }
     for (var log in history) {
-      print(log);
+      if (kDebugMode) {
+        print(log);
+      }
     }
   }
 }

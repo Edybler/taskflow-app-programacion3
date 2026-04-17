@@ -13,10 +13,19 @@ class Task {
 
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
-      id: json['id'],
-      userId: json['userId'],
-      title: json['title'],
-      completed: json['completed'],
+      id: json['id'] as int,
+      userId: json['userId'] as int,
+      title: json['title'] as String,
+      completed: json['completed'] as bool,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'title': title,
+      'completed': completed,
+    };
   }
 }

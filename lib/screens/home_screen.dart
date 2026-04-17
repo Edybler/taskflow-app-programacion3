@@ -3,6 +3,7 @@ import '../models/task_model.dart';
 import '../services/api_service.dart';
 import '../data_structures/linked_list.dart';
 import 'queue_screen.dart';
+import 'stack_screen.dart';
 import 'users_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -82,93 +83,90 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
     ).showSnackBar(SnackBar(content: Text('Tarea $id eliminada')));
   }
-Future<void> insertNewTask() async {
-  final titleController = TextEditingController();
-  final userController = TextEditingController();
 
-  await showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Agregar nueva tarea'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre de la tarea',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: userController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'ID del usuario',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final title = titleController.text.trim();
-              final userId = int.tryParse(userController.text.trim());
+  Future<void> insertNewTask() async {
+    final titleController = TextEditingController();
+    final userController = TextEditingController();
 
-              if (title.isEmpty || userId == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Completa bien los campos'),
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Agregar nueva tarea'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre de la tarea',
+                    border: OutlineInputBorder(),
                   ),
-                );
-                return;
-              }
-
-              final currentTasks = linkedList.toList();
-              final newId = currentTasks.isNotEmpty
-                  ? currentTasks
-                          .map((t) => t.id)
-                          .reduce((a, b) => a > b ? a : b) +
-                      1
-                  : 1;
-
-              final newTask = Task(
-                id: newId,
-                userId: userId,
-                title: title,
-                completed: false,
-              );
-
-              linkedList.insert(newTask);
-
-              setState(() {
-                displayedTasks = linkedList.toList();
-              });
-
-              Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Tarea agregada correctamente'),
                 ),
-              );
-            },
-            child: const Text('Agregar'),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: userController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'ID del usuario',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
-      );
-    },
-  );
-}
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final title = titleController.text.trim();
+                final userId = int.tryParse(userController.text.trim());
+
+                if (title.isEmpty || userId == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Completa bien los campos')),
+                  );
+                  return;
+                }
+
+                final currentTasks = linkedList.toList();
+                final newId = currentTasks.isNotEmpty
+                    ? currentTasks
+                              .map((t) => t.id)
+                              .reduce((a, b) => a > b ? a : b) +
+                          1
+                    : 1;
+
+                final newTask = Task(
+                  id: newId,
+                  userId: userId,
+                  title: title,
+                  completed: false,
+                );
+
+                linkedList.insert(newTask);
+
+                setState(() {
+                  displayedTasks = linkedList.toList();
+                });
+
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Tarea agregada correctamente')),
+                );
+              },
+              child: const Text('Agregar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -203,14 +201,24 @@ Future<void> insertNewTask() async {
               );
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.layers),
+            tooltip: 'Ver Pila',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const StackScreen()),
+              );
+            },
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: insertNewTask,
-          icon: const Icon(Icons.add),
-          label: const Text('Agregar'),
+        icon: const Icon(Icons.add),
+        label: const Text('Agregar'),
       ),
-    floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
