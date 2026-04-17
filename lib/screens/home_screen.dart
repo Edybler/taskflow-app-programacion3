@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/task_model.dart';
 import '../services/api_service.dart';
 import '../data_structures/linked_list.dart';
+import 'queue_screen.dart';
+import 'users_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -50,9 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final id = int.tryParse(searchController.text);
 
     if (id == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un ID válido')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Ingresa un ID válido')));
       return;
     }
 
@@ -76,31 +78,97 @@ class _HomeScreenState extends State<HomeScreen> {
       displayedTasks = linkedList.toList();
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Tarea $id eliminada')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Tarea $id eliminada')));
   }
+Future<void> insertNewTask() async {
+  final titleController = TextEditingController();
+  final userController = TextEditingController();
 
-  void insertNewTask() {
-    final newTask = Task(
-      id: displayedTasks.isNotEmpty
-          ? displayedTasks.map((t) => t.id).reduce((a, b) => a > b ? a : b) + 1
-          : 1,
-      userId: 99,
-      title: 'Nueva tarea agregada manualmente',
-      completed: false,
-    );
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Agregar nueva tarea'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la tarea',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: userController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'ID del usuario',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final title = titleController.text.trim();
+              final userId = int.tryParse(userController.text.trim());
 
-    linkedList.insert(newTask);
+              if (title.isEmpty || userId == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Completa bien los campos'),
+                  ),
+                );
+                return;
+              }
 
-    setState(() {
-      displayedTasks = linkedList.toList();
-    });
+              final currentTasks = linkedList.toList();
+              final newId = currentTasks.isNotEmpty
+                  ? currentTasks
+                          .map((t) => t.id)
+                          .reduce((a, b) => a > b ? a : b) +
+                      1
+                  : 1;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Nueva tarea insertada')),
-    );
-  }
+              final newTask = Task(
+                id: newId,
+                userId: userId,
+                title: title,
+                completed: false,
+              );
+
+              linkedList.insert(newTask);
+
+              setState(() {
+                displayedTasks = linkedList.toList();
+              });
+
+              Navigator.pop(context);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Tarea agregada correctamente'),
+                ),
+              );
+            },
+            child: const Text('Agregar'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   @override
   void dispose() {
@@ -114,11 +182,35 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('TaskFlow App - Lista Enlazada'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: 'Ver Usuarios',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const UsersScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.queue),
+            tooltip: 'Ver Cola',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QueueScreen()),
+              );
+            },
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: insertNewTask,
-        child: const Icon(Icons.add),
+          icon: const Icon(Icons.add),
+          label: const Text('Agregar'),
       ),
+    floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -160,41 +252,39 @@ class _HomeScreenState extends State<HomeScreen> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : errorMessage != null
-                      ? Center(child: Text(errorMessage!))
-                      : displayedTasks.isEmpty
-                          ? const Center(
-                              child: Text('No hay tareas para mostrar'),
-                            )
-                          : ListView.builder(
-                              itemCount: displayedTasks.length,
-                              itemBuilder: (context, index) {
-                                final task = displayedTasks[index];
+                  ? Center(child: Text(errorMessage!))
+                  : displayedTasks.isEmpty
+                  ? const Center(child: Text('No hay tareas para mostrar'))
+                  : ListView.builder(
+                      itemCount: displayedTasks.length,
+                      itemBuilder: (context, index) {
+                        final task = displayedTasks[index];
 
-                                return Card(
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      child: Text(task.id.toString()),
-                                    ),
-                                    title: Text(task.title),
-                                    subtitle: Text('Usuario: ${task.userId}'),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          task.completed
-                                              ? Icons.check_circle
-                                              : Icons.pending_actions,
-                                        ),
-                                        IconButton(
-                                          onPressed: () => deleteTask(task.id),
-                                          icon: const Icon(Icons.delete),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
+                        return Card(
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              child: Text(task.id.toString()),
                             ),
+                            title: Text(task.title),
+                            subtitle: Text('Usuario: ${task.userId}'),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  task.completed
+                                      ? Icons.check_circle
+                                      : Icons.pending_actions,
+                                ),
+                                IconButton(
+                                  onPressed: () => deleteTask(task.id),
+                                  icon: const Icon(Icons.delete),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
