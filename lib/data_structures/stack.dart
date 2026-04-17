@@ -47,7 +47,7 @@ class MyStack<T> {
   bool get isEmpty => _storage.isEmpty;
   int get length => _storage.length;
 
-  get items => null;
+  List<T> get items => List.unmodifiable(_storage);
   
   void printHistory() {
     print("--- Historial de la Pila ---");
