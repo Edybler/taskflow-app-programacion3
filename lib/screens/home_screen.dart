@@ -82,27 +82,93 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
     ).showSnackBar(SnackBar(content: Text('Tarea $id eliminada')));
   }
+Future<void> insertNewTask() async {
+  final titleController = TextEditingController();
+  final userController = TextEditingController();
 
-  void insertNewTask() {
-    final newTask = Task(
-      id: displayedTasks.isNotEmpty
-          ? displayedTasks.map((t) => t.id).reduce((a, b) => a > b ? a : b) + 1
-          : 1,
-      userId: 99,
-      title: 'Nueva tarea agregada manualmente',
-      completed: false,
-    );
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Agregar nueva tarea'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la tarea',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: userController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'ID del usuario',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final title = titleController.text.trim();
+              final userId = int.tryParse(userController.text.trim());
 
-    linkedList.insert(newTask);
+              if (title.isEmpty || userId == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Completa bien los campos'),
+                  ),
+                );
+                return;
+              }
 
-    setState(() {
-      displayedTasks = linkedList.toList();
-    });
+              final currentTasks = linkedList.toList();
+              final newId = currentTasks.isNotEmpty
+                  ? currentTasks
+                          .map((t) => t.id)
+                          .reduce((a, b) => a > b ? a : b) +
+                      1
+                  : 1;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Nueva tarea insertada')));
-  }
+              final newTask = Task(
+                id: newId,
+                userId: userId,
+                title: title,
+                completed: false,
+              );
+
+              linkedList.insert(newTask);
+
+              setState(() {
+                displayedTasks = linkedList.toList();
+              });
+
+              Navigator.pop(context);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Tarea agregada correctamente'),
+                ),
+              );
+            },
+            child: const Text('Agregar'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   @override
   void dispose() {
@@ -139,10 +205,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: insertNewTask,
-        child: const Icon(Icons.add),
+          icon: const Icon(Icons.add),
+          label: const Text('Agregar'),
       ),
+    floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
