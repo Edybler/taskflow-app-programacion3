@@ -3,6 +3,7 @@ import '../models/task_model.dart';
 import '../services/api_service.dart';
 import '../data_structures/linked_list.dart';
 import 'queue_screen.dart';
+import 'stack_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -123,6 +124,16 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const QueueScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.layers),
+            tooltip: 'Ver Pila',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const StackScreen()),
               );
             },
           ),
