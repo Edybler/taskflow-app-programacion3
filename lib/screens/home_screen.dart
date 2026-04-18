@@ -287,9 +287,32 @@ Future<void> insertNewTask() async {
                                       : Icons.pending_actions,
                                 ),
                                 IconButton(
-                                  onPressed: () => deleteTask(task.id),
-                                  icon: const Icon(Icons.delete),
-                                ),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                        builder: (context) {
+                                return AlertDialog(
+                                title: const Text('Confirmar eliminación'),
+                                content: const Text('¿Seguro que deseas eliminar esta tarea?'),
+                              actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancelar'),
+                            ),
+                            ElevatedButton(
+                        onPressed: () {
+                      deleteTask(task.id);
+                      Navigator.pop(context);
+                        },
+                        child: const Text('Eliminar'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+                      icon: const Icon(Icons.delete),
+                        ),
                               ],
                             ),
                           ),
