@@ -91,7 +91,7 @@ Future<void> insertNewTask() async {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Agregar nueva tarea'),
+        title: Text('Agregar nueva tarea'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -118,7 +118,7 @@ Future<void> insertNewTask() async {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -147,6 +147,7 @@ Future<void> insertNewTask() async {
                 userId: userId,
                 title: title,
                 completed: false,
+                imageUrl: null,
               );
 
               linkedList.insert(newTask);
@@ -181,7 +182,7 @@ Future<void> insertNewTask() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TaskFlow App - Lista Enlazada'),
+        title: Text('TaskFlow App - Lista Enlazada'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -273,11 +274,16 @@ Future<void> insertNewTask() async {
 
                         return Card(
                           child: ListTile(
-                            leading: CircleAvatar(
-                              child: Text(task.id.toString()),
-                            ),
-                            title: Text(task.title),
-                            subtitle: Text('Usuario: ${task.userId}'),
+                            leading: task.imageUrl != null
+                            ? CircleAvatar(
+                            backgroundColor: Colors.white,
+                            backgroundImage: NetworkImage(task.imageUrl!),
+                                  )
+                              : CircleAvatar(
+                                child: Text(task.id.toString()),
+                                ),
+                                  title: Text(task.title.toUpperCase()),
+                                      subtitle: Text('Pokémon ID: ${task.id}'),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -311,6 +317,7 @@ Future<void> insertNewTask() async {
                 },
               );
             },
+
                       icon: const Icon(Icons.delete),
                         ),
                               ],

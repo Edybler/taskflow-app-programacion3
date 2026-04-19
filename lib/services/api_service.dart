@@ -6,31 +6,47 @@ import '../models/user_model.dart';
 class ApiService {
   final String baseUrl = 'https://jsonplaceholder.typicode.com';
 
-  Future<List<Task>> fetchTasks() async {
-    final url = Uri.parse('$baseUrl/todos?_limit=20');
+ Future<List<Task>> fetchTasks() async {
+  final url = Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=20');
 
-    try {
-      final response = await http.get(
-        url,
-        headers: {'Accept': 'application/json'},
-      );
+  try {
+    final response = await http.get(
+      url,
+      headers: {'Accept': 'application/json'},
+    );
 
-      print('STATUS CODE: ${response.statusCode}');
-      print('BODY: ${response.body}');
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List results = data['results'];
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((item) => Task.fromJson(item)).toList();
-      } else {
-        throw Exception(
-          'Error al cargar tareas. Código: ${response.statusCode}',
+      List<Task> tasks = [];
+
+      for (int i = 0; i < results.length; i++) {
+        final pokemon = results[i];
+
+        final int pokemonId = i + 1;
+        final String imageUrl =
+            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonId.png';
+
+        tasks.add(
+          Task(
+            id: pokemonId,
+            userId: 1,
+            title: pokemon['name'],
+            completed: false,
+            imageUrl: imageUrl,
+          ),
         );
       }
-    } catch (e) {
-      throw Exception('Fallo de conexión o lectura: $e');
-    }
-  }
 
+      return tasks;
+    } else {
+      throw Exception('Error al cargar tareas. Código: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Fallo de conexión o lectura: $e');
+  }
+}
   Future<List<UserModel>> fetchUsers() async {
     final url = Uri.parse('$baseUrl/users');
 
