@@ -1,49 +1,49 @@
 import 'package:flutter/material.dart';
+import '../data_structures/hash_table.dart';
+import '../data_structures/tree.dart';
 
 class AnalysisScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> tasks;
+  final HashTable hashTable;
 
-  AnalysisScreen({required this.tasks});
-
-  int get total => tasks.length;
-
-  int get completed =>
-      tasks.where((task) => task['completed'] == true).length;
-
-  int get pending =>
-      tasks.where((task) => task['completed'] == false).length;
-
-  Map<String, int> get tasksByUser {
-    Map<String, int> result = {};
-    for (var task in tasks) {
-      String user = task['user'];
-      result[user] = (result[user] ?? 0) + 1;
-    }
-    return result;
-  }
+  const AnalysisScreen({super.key, required this.hashTable});
 
   @override
   Widget build(BuildContext context) {
+    final tasks = hashTable.getAll();
+
+    int total = tasks.length;
+    int completed = tasks.where((t) => t.completed).length;
+    int pending = total - completed;
+
+    Map<String, int> tasksByUser = {};
+
+    for (var task in tasks) {
+      tasksByUser[task.user] =
+          (tasksByUser[task.user] ?? 0) + 1;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Análisis de Tareas"),
+        title: const Text("Análisis de tareas"),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Total de tareas: $total"),
             Text("Completadas: $completed"),
             Text("Pendientes: $pending"),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            Text("Tareas por usuario:",
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              "Tareas por usuario:",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
 
             ...tasksByUser.entries.map((entry) {
               return Text("${entry.key}: ${entry.value}");
-            }).toList(),
+            }),
           ],
         ),
       ),
