@@ -30,7 +30,7 @@ class TaskTree {
       printTree(child, indent + "  ");
     }
   }
-}class HashTable {
+}class hashtable {
   Map<int, dynamic> _table = {};
 
   void insert(int id, dynamic task) {

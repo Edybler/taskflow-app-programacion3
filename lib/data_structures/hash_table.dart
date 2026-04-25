@@ -1,21 +1,19 @@
-import 'tree.dart';
+class HashTable<T> {
+  final Map<String, T> _table = {};
 
-class HashTable {
-  final Map<String, Task> _table = {};
-
-  void insert(Task task) {
-    _table[task.id] = task;
+  void insert(String key, T value) {
+    _table[key] = value;
   }
 
-  Task? search(String id) {
-    return _table[id];
+  T? search(String key) {
+    return _table[key];
   }
 
-  void delete(String id) {
-    _table.remove(id);
+  void delete(String key) {
+    _table.remove(key);
   }
 
-  List<Task> getAll() {
+  List<T> getAll() {
     return _table.values.toList();
   }
 }
