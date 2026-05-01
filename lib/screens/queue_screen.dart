@@ -21,17 +21,15 @@ class _QueueScreenState extends State<QueueScreen> {
   @override
   void initState() {
     super.initState();
-    loadPendingTasks();
+    loadPendingTasks(); // Carga datos al iniciar la pantalla
   }
 
+  // ── Carga tareas de la API y encola solo las pendientes ──
   Future<void> loadPendingTasks() async {
     try {
       final tasks = await apiService.fetchTasks();
-      // Solo encolar tareas pendientes (completed == false)
       for (final task in tasks) {
-        if (!task.completed) {
-          taskQueue.enqueue(task);
-        }
+        if (!task.completed) taskQueue.enqueue(task);
       }
       setState(() => isLoading = false);
     } catch (e) {
@@ -42,27 +40,23 @@ class _QueueScreenState extends State<QueueScreen> {
     }
   }
 
+  // ── Elimina y muestra la primera tarea de la cola ──
   void dequeue() {
     final task = taskQueue.dequeue();
     if (task != null) {
       setState(() => lastDequeued = task);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Procesada: "${task.title}"'),
-          backgroundColor: Colors.green,
-        ),
+        SnackBar(content: Text('Procesada: "${task.title}"')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('La cola está vacía'),
-          backgroundColor: Colors.orange,
-        ),
+        const SnackBar(content: Text('La cola está vacía')),
       );
     }
     setState(() {});
   }
 
+  // ── Crea una tarea de prueba y la agrega al final ──
   void enqueueManual() {
     final newTask = Task(
       id: DateTime.now().millisecondsSinceEpoch % 100000,
@@ -83,89 +77,45 @@ class _QueueScreenState extends State<QueueScreen> {
     final frontTask = taskQueue.peek();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cola (Queue) — Tareas Pendientes'),
-        centerTitle: true,
+      backgroundColor: Colors.white,
+      appBar: AppBar(title: const Text('Cola — Tareas Pendientes'),
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: enqueueManual,
-        tooltip: 'Encolar tarea',
         child: const Icon(Icons.add),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
             : errorMessage != null
                 ? Center(child: Text(errorMessage!))
                 : Column(
                     children: [
-                      // Panel de info
-                      Card(
-                        color: Colors.blue.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Column(
-                                children: [
-                                  Text('${taskQueue.size}',
-                                      style: const TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.bold)),
-                                  const Text('En cola'),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Text(
-                                    frontTask != null
-                                        ? '#${frontTask.id}'
-                                        : '—',
-                                    style: const TextStyle(
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Text('Siguiente'),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+
+                      // Info de la cola
+                      Text('Tareas en cola: ${taskQueue.size}'),
+                      const SizedBox(height: 8),
+                      Text('Siguiente: ${frontTask != null ? "#${frontTask.id}" : "—"}'),
                       const SizedBox(height: 8),
 
-                      // Última tarea procesada
+                      // Última tarea procesada (solo si existe)
                       if (lastDequeued != null)
-                        Card(
-                          color: Colors.green.shade50,
-                          child: ListTile(
-                            leading: const Icon(Icons.check_circle,
-                                color: Colors.green),
-                            title: Text(lastDequeued!.title),
-                            subtitle: const Text('Última procesada (dequeue)'),
-                          ),
-                        ),
+                        Text('Última procesada: ${lastDequeued!.title}'),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 16),
 
-                      // Botón dequeue
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: taskQueue.isEmpty ? null : dequeue,
-                          icon: const Icon(Icons.play_arrow),
-                          label: const Text('Procesar siguiente (Dequeue)'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
+                      // Botón deshabilitado si la cola está vacía
+                      ElevatedButton(
+                        onPressed: taskQueue.isEmpty ? null : dequeue,
+                        child: const Text('Procesar siguiente'),
                       ),
-                      const SizedBox(height: 8),
 
-                      // Lista de la cola
+                      const SizedBox(height: 16),
+
+                      // Lista de tareas en cola
                       Expanded(
                         child: tasks.isEmpty
                             ? const Center(child: Text('Cola vacía'))
@@ -173,33 +123,13 @@ class _QueueScreenState extends State<QueueScreen> {
                                 itemCount: tasks.length,
                                 itemBuilder: (context, index) {
                                   final task = tasks[index];
-                                  return Card(
-                                    child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor: index == 0
-                                            ? Colors.deepPurple
-                                            : Colors.grey.shade300,
-                                        child: Text(
-                                          '${index + 1}',
-                                          style: TextStyle(
-                                            color: index == 0
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      title: Text(task.title),
-                                      subtitle: Text('ID: ${task.id}'),
-                                      trailing: index == 0
-                                          ? const Chip(
-                                              label: Text('FRENTE'),
-                                              backgroundColor:
-                                                  Colors.deepPurple,
-                                              labelStyle: TextStyle(
-                                                  color: Colors.white),
-                                            )
-                                          : null,
-                                    ),
+                                  return ListTile(
+                                    leading: Text('${index + 1}'),
+                                    title: Text(task.title),
+                                    subtitle: Text('ID: ${task.id}'),
+                                    trailing: index == 0
+                                        ? const Text('[FRENTE]')
+                                        : null,
                                   );
                                 },
                               ),
