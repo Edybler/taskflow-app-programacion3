@@ -80,7 +80,7 @@ class _QueueScreenState extends State<QueueScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Cola — Tareas Pendientes'),
       backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
+      foregroundColor: Colors.pink,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: enqueueManual,
