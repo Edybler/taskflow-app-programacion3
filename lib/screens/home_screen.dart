@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:taskflow_app/screens/users_screen.dart';
+
 import '../models/task_model.dart';
 import '../services/api_service.dart';
 import '../data_structures/linked_list.dart';
+
+// 🔥 NUEVAS PANTALLAS
 import 'queue_screen.dart';
 import 'stack_screen.dart';
+import 'analysis_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     loadTasks();
   }
 
+  /// 🔥 CARGAR DATOS
   Future<void> loadTasks() async {
     try {
       final tasks = await apiService.fetchTasks();
@@ -49,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// 🔍 BUSCAR
   void searchTask() {
     final id = int.tryParse(searchController.text);
 
@@ -66,12 +72,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  /// 📋 MOSTRAR TODAS
   void showAllTasks() {
     setState(() {
       displayedTasks = linkedList.toList();
     });
   }
 
+  /// 🗑 ELIMINAR
   void deleteTask(int id) {
     linkedList.delete(id);
 
@@ -84,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// 🔥 CONFIRMAR ELIMINACIÓN
+  /// ⚠ CONFIRMAR ELIMINACIÓN
   void confirmDelete(Task task) {
     showDialog(
       context: context,
@@ -110,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// ➕ INSERTAR NUEVA TAREA
+  /// ➕ AGREGAR TAREA
   Future<void> insertNewTask() async {
     final titleController = TextEditingController();
     final userController = TextEditingController();
@@ -159,8 +167,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
 
                 final currentTasks = linkedList.toList();
+
                 final newId = currentTasks.isNotEmpty
-                    ? currentTasks.map((t) => t.id).reduce((a, b) => a > b ? a : b) + 1
+                    ? currentTasks
+                            .map((t) => t.id)
+                            .reduce((a, b) => a > b ? a : b) +
+                        1
                     : 1;
 
                 final newTask = Task(
@@ -202,6 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
+            tooltip: 'Usuarios',
             onPressed: () {
               Navigator.push(
                 context,
@@ -211,6 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.queue),
+            tooltip: 'Cola',
             onPressed: () {
               Navigator.push(
                 context,
@@ -220,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.layers),
+            tooltip: 'Pila',
             onPressed: () {
               Navigator.push(
                 context,
@@ -230,19 +245,70 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: insertNewTask,
-        icon: const Icon(Icons.add),
-        label: const Text('Agregar'),
-      ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
+      /// 🔥 BOTONES NUEVOS (ÁRBOL / HASH / GRAFO / ANÁLISIS)
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            /// 🔍 BUSCAR
+            /// 🔘 BOTONES DE ESTRUCTURAS
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.account_tree),
+                    label: const Text("Árbol"),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Pantalla de Árbol pendiente")),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.grid_on),
+                    label: const Text("Hash"),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("HashTable en uso interno")),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.share),
+                    label: const Text("Grafo"),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Pantalla de Grafo pendiente")),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.analytics),
+                    label: const Text("Análisis"),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AnalysisScreen(tasks: displayedTasks),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            /// 🔍 BUSCADOR
             TextField(
               controller: searchController,
               keyboardType: TextInputType.number,
@@ -301,12 +367,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     : CircleAvatar(
                                         child: Text(task.id.toString()),
                                       ),
-
                                 title: Text(task.title.toUpperCase()),
-
-                                subtitle:
-                                    Text('Pokémon ID: ${task.id}'),
-
+                                subtitle: Text('Pokémon ID: ${task.id}'),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -315,7 +377,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ? Icons.check_circle
                                           : Icons.pending,
                                     ),
-
                                     IconButton(
                                       icon: const Icon(Icons.delete),
                                       onPressed: () => confirmDelete(task),
@@ -330,6 +391,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: insertNewTask,
+        icon: const Icon(Icons.add),
+        label: const Text('Agregar'),
+      ),
+
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.centerFloat,
     );
   }
 }

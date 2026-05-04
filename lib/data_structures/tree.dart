@@ -50,26 +50,6 @@ class TaskTree {
       print("ID: $key -> $value");
     });
   }
-}class HashTable {
-  final Map<int, dynamic> _table = {};
-
-  void insert(int id, dynamic task) {
-    _table[id] = task;
-  }
-
-  dynamic search(int id) {
-    return _table[id];
-  }
-
-  void delete(int id) {
-    _table.remove(id);
-  }
-
-  void printTable() {
-    _table.forEach((key, value) {
-      print("ID: $key -> $value");
-    });
-  }
 }class Graph {
   Map<String, List<String>> adjList = {};
 
