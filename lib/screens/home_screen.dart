@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taskflow_app/screens/users_screen.dart';
 
+import '../data_structures/hash_table.dart';
 import '../models/task_model.dart';
 import '../services/api_service.dart';
 import '../data_structures/linked_list.dart';
@@ -297,7 +298,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => AnalysisScreen(tasks: displayedTasks),
+                          builder: (_) {
+  final hashTable = HashTable<Task>();
+
+  for (var task in displayedTasks) {
+    hashTable.insert(task.id.toString(), task);
+  }
+
+  return AnalysisScreen(hashTable: hashTable);
+},
                         ),
                       );
                     },
