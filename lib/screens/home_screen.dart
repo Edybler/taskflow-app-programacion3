@@ -53,9 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final id = int.tryParse(searchController.text);
 
     if (id == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Ingresa un ID válido')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ingresa un ID válido')),
+      );
       return;
     }
 
@@ -79,21 +79,48 @@ class _HomeScreenState extends State<HomeScreen> {
       displayedTasks = linkedList.toList();
     });
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Tarea $id eliminada')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Tarea $id eliminada')),
+    );
   }
-Future<void> insertNewTask() async {
-  final titleController = TextEditingController();
-  final userController = TextEditingController();
 
-  await showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text('Agregar nueva tarea'),
-        content: SingleChildScrollView(
-          child: Column(
+  /// 🔥 CONFIRMAR ELIMINACIÓN
+  void confirmDelete(Task task) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirmar eliminación'),
+          content: Text('¿Eliminar "${task.title}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                deleteTask(task.id);
+                Navigator.pop(context);
+              },
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// ➕ INSERTAR NUEVA TAREA
+  Future<void> insertNewTask() async {
+    final titleController = TextEditingController();
+    final userController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Agregar nueva tarea'),
+          content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
@@ -103,7 +130,7 @@ Future<void> insertNewTask() async {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: userController,
                 keyboardType: TextInputType.number,
@@ -114,63 +141,51 @@ Future<void> insertNewTask() async {
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final title = titleController.text.trim();
-              final userId = int.tryParse(userController.text.trim());
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final title = titleController.text.trim();
+                final userId = int.tryParse(userController.text.trim());
 
-              if (title.isEmpty || userId == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Completa bien los campos'),
-                  ),
+                if (title.isEmpty || userId == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Datos inválidos')),
+                  );
+                  return;
+                }
+
+                final currentTasks = linkedList.toList();
+                final newId = currentTasks.isNotEmpty
+                    ? currentTasks.map((t) => t.id).reduce((a, b) => a > b ? a : b) + 1
+                    : 1;
+
+                final newTask = Task(
+                  id: newId,
+                  userId: userId,
+                  title: title,
+                  completed: false,
+                  imageUrl: null,
                 );
-                return;
-              }
 
-              final currentTasks = linkedList.toList();
-              final newId = currentTasks.isNotEmpty
-                  ? currentTasks
-                          .map((t) => t.id)
-                          .reduce((a, b) => a > b ? a : b) +
-                      1
-                  : 1;
+                linkedList.insert(newTask);
 
-              final newTask = Task(
-                id: newId,
-                userId: userId,
-                title: title,
-                completed: false,
-                imageUrl: null,
-              );
+                setState(() {
+                  displayedTasks = linkedList.toList();
+                });
 
-              linkedList.insert(newTask);
-
-              setState(() {
-                displayedTasks = linkedList.toList();
-              });
-
-              Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Tarea agregada correctamente'),
-                ),
-              );
-            },
-            child: const Text('Agregar'),
-          ),
-        ],
-      );
-    },
-  );
-}
+                Navigator.pop(context);
+              },
+              child: const Text('Agregar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -182,12 +197,11 @@ Future<void> insertNewTask() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TaskFlow App - Lista Enlazada'),
+        title: const Text('TaskFlow App - Lista Enlazada'),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
-            tooltip: 'Ver Usuarios',
             onPressed: () {
               Navigator.push(
                 context,
@@ -197,7 +211,6 @@ Future<void> insertNewTask() async {
           ),
           IconButton(
             icon: const Icon(Icons.queue),
-            tooltip: 'Ver Cola',
             onPressed: () {
               Navigator.push(
                 context,
@@ -207,7 +220,6 @@ Future<void> insertNewTask() async {
           ),
           IconButton(
             icon: const Icon(Icons.layers),
-            tooltip: 'Ver Pila',
             onPressed: () {
               Navigator.push(
                 context,
@@ -217,16 +229,20 @@ Future<void> insertNewTask() async {
           ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton.extended(
         onPressed: insertNewTask,
-          icon: const Icon(Icons.add),
-          label: const Text('Agregar'),
+        icon: const Icon(Icons.add),
+        label: const Text('Agregar'),
       ),
-    floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
+            /// 🔍 BUSCAR
             TextField(
               controller: searchController,
               keyboardType: TextInputType.number,
@@ -241,7 +257,9 @@ Future<void> insertNewTask() async {
                 ),
               ),
             ),
+
             const SizedBox(height: 10),
+
             Row(
               children: [
                 Expanded(
@@ -259,73 +277,55 @@ Future<void> insertNewTask() async {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+
+            const SizedBox(height: 10),
+
+            /// 📋 LISTA
             Expanded(
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : errorMessage != null
-                  ? Center(child: Text(errorMessage!))
-                  : displayedTasks.isEmpty
-                  ? const Center(child: Text('No hay tareas para mostrar'))
-                  : ListView.builder(
-                      itemCount: displayedTasks.length,
-                      itemBuilder: (context, index) {
-                        final task = displayedTasks[index];
+                      ? Center(child: Text(errorMessage!))
+                      : ListView.builder(
+                          itemCount: displayedTasks.length,
+                          itemBuilder: (context, index) {
+                            final task = displayedTasks[index];
 
-                        return Card(
-                          child: ListTile(
-                            leading: task.imageUrl != null
-                            ? CircleAvatar(
-                            backgroundColor: Colors.white,
-                            backgroundImage: NetworkImage(task.imageUrl!),
-                                  )
-                              : CircleAvatar(
-                                child: Text(task.id.toString()),
-                                ),
-                                  title: Text(task.title.toUpperCase()),
-                                      subtitle: Text('Pokémon ID: ${task.id}'),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  task.completed
-                                      ? Icons.check_circle
-                                      : Icons.pending_actions,
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                        builder: (context) {
-                                return AlertDialog(
-                                title: const Text('Confirmar eliminación'),
-                                content: const Text('¿Seguro que deseas eliminar esta tarea?'),
-                              actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancelar'),
-                            ),
-                            ElevatedButton(
-                        onPressed: () {
-                      deleteTask(task.id);
-                      Navigator.pop(context);
-                        },
-                        child: const Text('Eliminar'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
+                            return Card(
+                              child: ListTile(
+                                leading: task.imageUrl != null
+                                    ? CircleAvatar(
+                                        backgroundImage:
+                                            NetworkImage(task.imageUrl!),
+                                      )
+                                    : CircleAvatar(
+                                        child: Text(task.id.toString()),
+                                      ),
 
-                      icon: const Icon(Icons.delete),
+                                title: Text(task.title.toUpperCase()),
+
+                                subtitle:
+                                    Text('Pokémon ID: ${task.id}'),
+
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      task.completed
+                                          ? Icons.check_circle
+                                          : Icons.pending,
+                                    ),
+
+                                    IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () => confirmDelete(task),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
             ),
           ],
         ),
