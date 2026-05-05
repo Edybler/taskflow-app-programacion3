@@ -1,63 +1,37 @@
-import 'package:flutter/foundation.dart';
-
-class ActionLog {
-  final String action; // "insertar", "eliminar", "buscar"
-  final dynamic value;
+class StackLog<T> {
+  final String action;
+  final T value;
   final DateTime timestamp;
 
-  ActionLog(this.action, this.value) : timestamp = DateTime.now();
-
-  @override
-  String toString() =>
-      "[${timestamp.toString().substring(11, 19)}] $action: $value";
+  StackLog(this.action, this.value) : timestamp = DateTime.now();
 }
 
 class MyStack<T> {
-  final List<T> _storage = [];
-  final List<ActionLog> history = [];
+  // 🔥 NUNCA debe ser null
+  final List<T> items = [];
 
-  // 1. PUSH: Insertar elemento
-  void push(T element) {
-    _storage.add(element);
-    history.add(ActionLog("insertar", element));
+  // Historial de acciones
+  final List<StackLog<T>> history = [];
+
+  void push(T value) {
+    items.add(value);
+    history.add(StackLog("Push", value));
   }
 
-  // 2. POP: Eliminar y retornar el último elemento (Tope)
   T? pop() {
-    if (_storage.isEmpty) {
-      history.add(ActionLog("error", "Intento de eliminar en pila vacía"));
-      return null;
-    }
-    T lastElement = _storage.removeLast();
-    history.add(ActionLog("eliminar", lastElement));
-    return lastElement;
+    if (items.isEmpty) return null;
+
+    final value = items.removeLast();
+    history.add(StackLog("Pop", value));
+    return value;
   }
 
-  // 3. PEEK: Ver el elemento del tope sin eliminarlo
   T? peek() {
-    if (_storage.isEmpty) {
-      history.add(ActionLog("buscar", "Pila vacía (null)"));
-      return null;
-    }
-    T topElement = _storage.last;
-    history.add(ActionLog("buscar (peek)", topElement));
-    return topElement;
+    if (items.isEmpty) return null;
+    return items.last;
   }
 
-  // Auxiliares
-  bool get isEmpty => _storage.isEmpty;
-  int get length => _storage.length;
+  bool get isEmpty => items.isEmpty;
 
-  get items => null;
-  
-  void printHistory() {
-    if (kDebugMode) {
-      print("--- Historial de la Pila ---");
-    }
-    for (var log in history) {
-      if (kDebugMode) {
-        print(log);
-      }
-    }
-  }
+  int get length => items.length;
 }
