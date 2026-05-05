@@ -27,31 +27,11 @@ class TaskTree {
   void printTree(TreeNode node, [String indent = ""]) {
     print("$indent${node.value}");
     for (var child in node.children) {
-      printTree(child, indent + "  ");
+      printTree(child, "$indent  ");
     }
   }
-}class hashtable {
-  Map<int, dynamic> _table = {};
-
-  void insert(int id, dynamic task) {
-    _table[id] = task;
-  }
-
-  dynamic search(int id) {
-    return _table[id];
-  }
-
-  void delete(int id) {
-    _table.remove(id);
-  }
-
-  void printTable() {
-    _table.forEach((key, value) {
-      print("ID: $key -> $value");
-    });
-  }
 }class HashTable {
-  Map<int, dynamic> _table = {};
+  final Map<int, dynamic> _table = {};
 
   void insert(int id, dynamic task) {
     _table[id] = task;
