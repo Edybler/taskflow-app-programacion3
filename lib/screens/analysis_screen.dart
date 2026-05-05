@@ -50,7 +50,7 @@ class AnalysisScreen extends StatelessWidget {
                     return Text(
                       "Usuario ${entry.key}: ${entry.value} tareas",
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
       ),
