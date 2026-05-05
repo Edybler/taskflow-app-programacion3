@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:taskflow_app/screens/users_screen.dart';
 import '../models/task_model.dart';
 import '../services/api_service.dart';
 import '../data_structures/linked_list.dart';
 import 'queue_screen.dart';
 import 'stack_screen.dart';
+<<<<<<< HEAD
 import 'users_screen.dart';
+=======
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -84,9 +88,49 @@ class _HomeScreenState extends State<HomeScreen> {
     ).showSnackBar(SnackBar(content: Text('Tarea $id eliminada')));
   }
 
+<<<<<<< HEAD
   Future<void> insertNewTask() async {
     final titleController = TextEditingController();
     final userController = TextEditingController();
+=======
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Agregar nueva tarea'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la tarea',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: userController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'ID del usuario',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final title = titleController.text.trim();
+              final userId = int.tryParse(userController.text.trim());
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
 
     await showDialog(
       context: context,
@@ -103,6 +147,40 @@ class _HomeScreenState extends State<HomeScreen> {
                     labelText: 'Nombre de la tarea',
                     border: OutlineInputBorder(),
                   ),
+<<<<<<< HEAD
+=======
+                );
+                return;
+              }
+
+              final currentTasks = linkedList.toList();
+              final newId = currentTasks.isNotEmpty
+                  ? currentTasks
+                          .map((t) => t.id)
+                          .reduce((a, b) => a > b ? a : b) +
+                      1
+                  : 1;
+
+              final newTask = Task(
+                id: newId,
+                userId: userId,
+                title: title,
+                completed: false,
+                imageUrl: null,
+              );
+
+              linkedList.insert(newTask);
+
+              setState(() {
+                displayedTasks = linkedList.toList();
+              });
+
+              Navigator.pop(context);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Tarea agregada correctamente'),
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -178,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TaskFlow App - Lista Enlazada'),
+        title: Text('TaskFlow App - Lista Enlazada'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -270,11 +348,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         return Card(
                           child: ListTile(
-                            leading: CircleAvatar(
-                              child: Text(task.id.toString()),
-                            ),
-                            title: Text(task.title),
-                            subtitle: Text('Usuario: ${task.userId}'),
+                            leading: task.imageUrl != null
+                            ? CircleAvatar(
+                            backgroundColor: Colors.white,
+                            backgroundImage: NetworkImage(task.imageUrl!),
+                                  )
+                              : CircleAvatar(
+                                child: Text(task.id.toString()),
+                                ),
+                                  title: Text(task.title.toUpperCase()),
+                                      subtitle: Text('Pokémon ID: ${task.id}'),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -284,9 +367,33 @@ class _HomeScreenState extends State<HomeScreen> {
                                       : Icons.pending_actions,
                                 ),
                                 IconButton(
-                                  onPressed: () => deleteTask(task.id),
-                                  icon: const Icon(Icons.delete),
-                                ),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                        builder: (context) {
+                                return AlertDialog(
+                                title: const Text('Confirmar eliminación'),
+                                content: const Text('¿Seguro que deseas eliminar esta tarea?'),
+                              actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancelar'),
+                            ),
+                            ElevatedButton(
+                        onPressed: () {
+                      deleteTask(task.id);
+                      Navigator.pop(context);
+                        },
+                        child: const Text('Eliminar'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+
+                      icon: const Icon(Icons.delete),
+                        ),
                               ],
                             ),
                           ),

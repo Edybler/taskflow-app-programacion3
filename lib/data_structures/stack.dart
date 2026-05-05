@@ -47,8 +47,7 @@ class MyStack<T> {
   // Auxiliares
   bool get isEmpty => _storage.isEmpty;
   int get length => _storage.length;
-  List<T> get items => List.unmodifiable(_storage);
-
+  
   void printHistory() {
     if (kDebugMode) {
       print("--- Historial de la Pila ---");

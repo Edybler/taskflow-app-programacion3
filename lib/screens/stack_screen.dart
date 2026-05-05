@@ -31,6 +31,7 @@ class _StackScreenState extends State<StackScreen> {
     stack.push(value);
     valueController.clear();
     setState(() {});
+<<<<<<< HEAD
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('Insertado: $value')));
@@ -57,19 +58,57 @@ class _StackScreenState extends State<StackScreen> {
   void peekValue() {
     final item = stack.peek();
     lastPeeked = item;
+=======
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Insertado: $value')),
+    );
+  }
+
+  void popValue() {
+    final value = stack.pop();
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
     setState(() {});
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+<<<<<<< HEAD
         content: Text(item != null ? 'Último: $item' : 'La pila está vacía'),
+=======
+        content: Text(
+          value != null ? 'Eliminado: $value' : 'La pila está vacía',
+        ),
+        backgroundColor: value != null ? Colors.green : Colors.orange,
+      ),
+    );
+  }
+
+  void peekValue() {
+    final value = stack.peek();
+    lastPeeked = value;
+    setState(() {});
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(value != null ? 'Último: $value' : 'La pila está vacía'),
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return Scaffold(
       appBar: AppBar(title: const Text('Pila (Stack)'), centerTitle: true),
+=======
+    final items = stack.items.reversed.toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Stack - Pila'),
+        centerTitle: true,
+      ),
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -95,7 +134,11 @@ class _StackScreenState extends State<StackScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: popValue,
+<<<<<<< HEAD
                     icon: const Icon(Icons.delete),
+=======
+                    icon: const Icon(Icons.remove),
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                     label: const Text('Pop'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
@@ -117,19 +160,28 @@ class _StackScreenState extends State<StackScreen> {
             ),
             const SizedBox(height: 16),
             Card(
+<<<<<<< HEAD
               elevation: 2,
+=======
+              margin: EdgeInsets.zero,
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
+<<<<<<< HEAD
                       'Elementos en la pila',
+=======
+                      'Elementos de la pila',
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+<<<<<<< HEAD
                     const SizedBox(height: 8),
                     if (stack.isEmpty)
                       const Text('No hay elementos en la pila')
@@ -151,12 +203,38 @@ class _StackScreenState extends State<StackScreen> {
                               ),
                               title: Text(item),
                               subtitle: isTop ? const Text('Tope') : null,
+=======
+                    const SizedBox(height: 10),
+                    if (items.isEmpty)
+                      const Text('La pila está vacía')
+                    else
+                      SizedBox(
+                        height: 180,
+                        child: ListView.separated(
+                          itemCount: items.length,
+                          separatorBuilder: (context, index) => const Divider(),
+                          itemBuilder: (context, index) {
+                            final item = items[index];
+                            return ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: index == 0
+                                    ? Colors.deepPurple
+                                    : Colors.grey,
+                                child: Text('${items.length - index}'),
+                              ),
+                              title: Text(item),
+                              subtitle: index == 0 ? const Text('Tope') : null,
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                             );
                           },
                         ),
                       ),
                     if (lastPeeked != null) ...[
+<<<<<<< HEAD
                       const SizedBox(height: 12),
+=======
+                      const SizedBox(height: 10),
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                       Text('Último visto: $lastPeeked'),
                     ],
                   ],
@@ -168,13 +246,21 @@ class _StackScreenState extends State<StackScreen> {
               alignment: Alignment.centerLeft,
               child: Text(
                 'Historial de acciones',
+<<<<<<< HEAD
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+=======
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
               ),
             ),
             const SizedBox(height: 8),
             Expanded(
               child: stack.history.isEmpty
+<<<<<<< HEAD
                   ? const Center(child: Text('No hay acciones registradas'))
+=======
+                  ? const Center(child: Text('No hay acciones aún'))
+>>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                   : ListView.separated(
                       itemCount: stack.history.length,
                       separatorBuilder: (context, index) => const Divider(),
