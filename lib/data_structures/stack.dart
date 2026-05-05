@@ -47,6 +47,8 @@ class MyStack<T> {
   // Auxiliares
   bool get isEmpty => _storage.isEmpty;
   int get length => _storage.length;
+
+  get items => null;
   
   void printHistory() {
     if (kDebugMode) {
