@@ -31,15 +31,15 @@ class _StackScreenState extends State<StackScreen> {
     stack.push(value);
     valueController.clear();
     setState(() {});
-<<<<<<< HEAD
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Insertado: $value')));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Insertado: $value')),
+    );
   }
 
   void popValue() {
-    final item = stack.pop();
-    if (item == null) {
+    final value = stack.pop();
+    if (value == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('La pila está vacía'),
@@ -50,34 +50,10 @@ class _StackScreenState extends State<StackScreen> {
     }
 
     setState(() {});
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Eliminado: $item')));
-  }
-
-  void peekValue() {
-    final item = stack.peek();
-    lastPeeked = item;
-=======
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Insertado: $value')),
-    );
-  }
-
-  void popValue() {
-    final value = stack.pop();
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
-    setState(() {});
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-<<<<<<< HEAD
-        content: Text(item != null ? 'Último: $item' : 'La pila está vacía'),
-=======
-        content: Text(
-          value != null ? 'Eliminado: $value' : 'La pila está vacía',
-        ),
-        backgroundColor: value != null ? Colors.green : Colors.orange,
+        content: Text('Eliminado: $value'),
+        backgroundColor: Colors.green,
       ),
     );
   }
@@ -90,25 +66,19 @@ class _StackScreenState extends State<StackScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(value != null ? 'Último: $value' : 'La pila está vacía'),
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    return Scaffold(
-      appBar: AppBar(title: const Text('Pila (Stack)'), centerTitle: true),
-=======
     final items = stack.items.reversed.toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stack - Pila'),
+        title: const Text('Pila (Stack)'),
         centerTitle: true,
       ),
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -127,19 +97,15 @@ class _StackScreenState extends State<StackScreen> {
                   child: ElevatedButton.icon(
                     onPressed: pushValue,
                     icon: const Icon(Icons.arrow_upward),
-                    label: const Text('Push'),
+                    label: const Text('agregar'),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: popValue,
-<<<<<<< HEAD
-                    icon: const Icon(Icons.delete),
-=======
                     icon: const Icon(Icons.remove),
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
-                    label: const Text('Pop'),
+                    label: const Text('eliminar'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                     ),
@@ -150,7 +116,7 @@ class _StackScreenState extends State<StackScreen> {
                   child: ElevatedButton.icon(
                     onPressed: peekValue,
                     icon: const Icon(Icons.visibility),
-                    label: const Text('Peek'),
+                    label: const Text('ver'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                     ),
@@ -160,53 +126,22 @@ class _StackScreenState extends State<StackScreen> {
             ),
             const SizedBox(height: 16),
             Card(
-<<<<<<< HEAD
               elevation: 2,
-=======
-              margin: EdgeInsets.zero,
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-<<<<<<< HEAD
                       'Elementos en la pila',
-=======
-                      'Elementos de la pila',
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-<<<<<<< HEAD
                     const SizedBox(height: 8),
-                    if (stack.isEmpty)
-                      const Text('No hay elementos en la pila')
-                    else
-                      SizedBox(
-                        height: 180,
-                        child: ListView.builder(
-                          itemCount: stack.items.length,
-                          itemBuilder: (context, index) {
-                            final position = stack.items.length - index;
-                            final item = stack.items.reversed.toList()[index];
-                            final isTop = index == 0;
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: isTop
-                                    ? Colors.deepPurple
-                                    : Colors.grey,
-                                child: Text('$position'),
-                              ),
-                              title: Text(item),
-                              subtitle: isTop ? const Text('Tope') : null,
-=======
-                    const SizedBox(height: 10),
                     if (items.isEmpty)
-                      const Text('La pila está vacía')
+                      const Text('No hay elementos en la pila')
                     else
                       SizedBox(
                         height: 180,
@@ -224,17 +159,12 @@ class _StackScreenState extends State<StackScreen> {
                               ),
                               title: Text(item),
                               subtitle: index == 0 ? const Text('Tope') : null,
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                             );
                           },
                         ),
                       ),
                     if (lastPeeked != null) ...[
-<<<<<<< HEAD
-                      const SizedBox(height: 12),
-=======
                       const SizedBox(height: 10),
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                       Text('Último visto: $lastPeeked'),
                     ],
                   ],
@@ -246,21 +176,13 @@ class _StackScreenState extends State<StackScreen> {
               alignment: Alignment.centerLeft,
               child: Text(
                 'Historial de acciones',
-<<<<<<< HEAD
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-=======
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
               ),
             ),
             const SizedBox(height: 8),
             Expanded(
               child: stack.history.isEmpty
-<<<<<<< HEAD
                   ? const Center(child: Text('No hay acciones registradas'))
-=======
-                  ? const Center(child: Text('No hay acciones aún'))
->>>>>>> 5d389afce327bcb9b0a4380794e911934e089f9a
                   : ListView.separated(
                       itemCount: stack.history.length,
                       separatorBuilder: (context, index) => const Divider(),
