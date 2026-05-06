@@ -11,6 +11,7 @@ class StackScreen extends StatefulWidget {
 class _StackScreenState extends State<StackScreen> {
   final MyStack<String> stack = MyStack<String>();
   final TextEditingController valueController = TextEditingController();
+
   String? lastPeeked;
 
   @override
@@ -21,9 +22,10 @@ class _StackScreenState extends State<StackScreen> {
 
   void pushValue() {
     final value = valueController.text.trim();
+
     if (value.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un valor para insertar')),
+        const SnackBar(content: Text('Ingresa un valor')),
       );
       return;
     }
@@ -31,6 +33,7 @@ class _StackScreenState extends State<StackScreen> {
     stack.push(value);
     valueController.clear();
     setState(() {});
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Insertado: $value')),
     );
@@ -38,51 +41,65 @@ class _StackScreenState extends State<StackScreen> {
 
   void popValue() {
     final value = stack.pop();
+
+    if (value == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('La pila está vacía')),
+      );
+      return;
+    }
+
     setState(() {});
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          value != null ? 'Eliminado: $value' : 'La pila está vacía',
-        ),
-        backgroundColor: value != null ? Colors.green : Colors.orange,
-      ),
+      SnackBar(content: Text('Eliminado: $value')),
     );
   }
 
   void peekValue() {
     final value = stack.peek();
-    lastPeeked = value;
-    setState(() {});
+
+    setState(() {
+      lastPeeked = value;
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(value != null ? 'Último: $value' : 'La pila está vacía'),
+        content: Text(
+          value != null ? 'Último: $value' : 'La pila está vacía',
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = stack.items.reversed.toList();
+    // 🔥 PROTECCIÓN CONTRA NULL
+    final items = stack.items.isEmpty
+        ? []
+        : stack.items.reversed.toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stack - Pila'),
+        title: const Text('Pila (Stack)'),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
+            /// INPUT
             TextField(
               controller: valueController,
               decoration: const InputDecoration(
-                labelText: 'Valor a insertar',
+                labelText: 'Valor',
                 border: OutlineInputBorder(),
               ),
             ),
+
             const SizedBox(height: 12),
+
+            /// BOTONES
             Row(
               children: [
                 Expanded(
@@ -116,32 +133,31 @@ class _StackScreenState extends State<StackScreen> {
                 ),
               ],
             ),
+
             const SizedBox(height: 16),
+
+            /// LISTA DE ELEMENTOS
             Card(
-              margin: EdgeInsets.zero,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Elementos de la pila',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      'Elementos en la pila',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
+
                     if (items.isEmpty)
-                      const Text('La pila está vacía')
+                      const Text('Pila vacía')
                     else
                       SizedBox(
                         height: 180,
-                        child: ListView.separated(
+                        child: ListView.builder(
                           itemCount: items.length,
-                          separatorBuilder: (context, index) => const Divider(),
                           itemBuilder: (context, index) {
                             final item = items[index];
+
                             return ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: index == 0
@@ -150,43 +166,41 @@ class _StackScreenState extends State<StackScreen> {
                                 child: Text('${items.length - index}'),
                               ),
                               title: Text(item),
-                              subtitle: index == 0 ? const Text('Tope') : null,
+                              subtitle:
+                                  index == 0 ? const Text('Tope') : null,
                             );
                           },
                         ),
                       ),
+
                     if (lastPeeked != null) ...[
                       const SizedBox(height: 10),
                       Text('Último visto: $lastPeeked'),
-                    ],
+                    ]
                   ],
                 ),
               ),
             ),
+
             const SizedBox(height: 16),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Historial de acciones',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
-            const SizedBox(height: 8),
+
+            /// HISTORIAL
             Expanded(
               child: stack.history.isEmpty
-                  ? const Center(child: Text('No hay acciones aún'))
-                  : ListView.separated(
+                  ? const Center(child: Text('Sin historial'))
+                  : ListView.builder(
                       itemCount: stack.history.length,
-                      separatorBuilder: (context, index) => const Divider(),
                       itemBuilder: (context, index) {
                         final log = stack.history[index];
+
                         return ListTile(
                           leading: const Icon(Icons.history),
                           title: Text(log.action),
                           subtitle: Text(log.value.toString()),
                           trailing: Text(
-                            log.timestamp.toString().substring(11, 19),
-                            style: const TextStyle(fontSize: 12),
+                            log.timestamp
+                                .toString()
+                                .substring(11, 19),
                           ),
                         );
                       },

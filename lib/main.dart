@@ -14,6 +14,7 @@ class TaskFlowApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'TaskFlow App',
       theme: ThemeData(
+        scaffoldBackgroundColor: Colors.green[100],
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
