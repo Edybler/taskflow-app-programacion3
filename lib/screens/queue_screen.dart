@@ -77,10 +77,11 @@ class _QueueScreenState extends State<QueueScreen> {
     final frontTask = taskQueue.peek();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 100, 119, 214),
       appBar: AppBar(title: const Text('Cola — Tareas Pendientes'),
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.pink,
+      backgroundColor: const Color.fromARGB(255, 13, 3, 89),
+      foregroundColor: const Color.fromARGB(255, 219, 4, 4),
+       // Agrega una sombra sutil al AppBar
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: enqueueManual,
