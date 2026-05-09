@@ -106,7 +106,7 @@ class _StackScreenState extends State<StackScreen> {
                   child: ElevatedButton.icon(
                     onPressed: pushValue,
                     icon: const Icon(Icons.arrow_upward),
-                    label: const Text('Push'),
+                    label: const Text('agregar'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -114,7 +114,7 @@ class _StackScreenState extends State<StackScreen> {
                   child: ElevatedButton.icon(
                     onPressed: popValue,
                     icon: const Icon(Icons.remove),
-                    label: const Text('Pop'),
+                    label: const Text('eliminar'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                     ),
@@ -125,7 +125,7 @@ class _StackScreenState extends State<StackScreen> {
                   child: ElevatedButton.icon(
                     onPressed: peekValue,
                     icon: const Icon(Icons.visibility),
-                    label: const Text('Peek'),
+                    label: const Text('ver'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                     ),
